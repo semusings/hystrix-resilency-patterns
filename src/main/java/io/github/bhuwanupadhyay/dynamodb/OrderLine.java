@@ -9,6 +9,5 @@ import java.util.List;
 @Data
 @DynamoDBDocument
 public class OrderLine {
-	@DynamoDBAttribute
-  private List<OrderItem> orderItems;
+  @DynamoDBAttribute private List<OrderItem> orderItems;
 }
