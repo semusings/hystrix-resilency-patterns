@@ -1,5 +1,5 @@
-= Factory Parent Example
-:repo: factory-parent-example
+= Dynamo DB Nested Object
+:repo: 18-dynamo-db-nested-object
 :github: https://github.com/BhuwanUpadhyay/{repo}
 :githubmaster: {github}/tree/master
 :revnumber: {project-version}

@@ -1,1 +1,1 @@
-Factory Parent Example is a base template project for maven.
+Dynamo DB Nested Object is a base template project for maven.

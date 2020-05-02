@@ -4,8 +4,20 @@
 		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
-	<artifactId>factory-parent-example</artifactId>
+	<artifactId>18-dynamo-db-nested-object</artifactId>
 	<version>1.0.0-SNAPSHOT</version>
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<configuration>
+					<source>13</source>
+					<target>13</target>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
 
 	<parent>
 		<groupId>io.github.bhuwanupadhyay</groupId>
@@ -14,25 +26,57 @@
 	</parent>
 
 	<scm>
-		<url>https://github.com/BhuwanUpadhyay/factory-parent-example</url>
-		<connection>scm:git:git://github.com/BhuwanUpadhyay/factory-parent-example.git
+		<url>https://github.com/BhuwanUpadhyay/18-dynamo-db-nested-object</url>
+		<connection>scm:git:git://github.com/BhuwanUpadhyay/18-dynamo-db-nested-object.git
 		</connection>
 		<developerConnection>
-			scm:git:ssh://git@github.com/BhuwanUpadhyay/factory-parent-example.git
+			scm:git:ssh://git@github.com/BhuwanUpadhyay/18-dynamo-db-nested-object.git
 		</developerConnection>
 		<tag>HEAD</tag>
 	</scm>
 
-	<name>Factory Parent Example</name>
-	<description>Demo Project to Factory Parent Example.</description>
-	<url>https://github.com/BhuwanUpadhyay/factory-parent-example</url>
+	<name>Dynamo DB Nested Object</name>
+	<description>Demo Project to Dynamo DB Nested Object.</description>
+	<url>https://github.com/BhuwanUpadhyay/18-dynamo-db-nested-object</url>
 
 	<properties>
 		<java.version>14</java.version>
 	</properties>
 
 	<dependencies>
+		<dependency>
+			<groupId>org.projectlombok</groupId>
+			<artifactId>lombok</artifactId>
+			<optional>true</optional>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-web</artifactId>
+		</dependency>
 
+		<dependency>
+			<groupId>com.amazonaws</groupId>
+			<artifactId>aws-java-sdk-dynamodb</artifactId>
+		</dependency>
+
+		<!-- -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-test</artifactId>
+			<scope>test</scope>
+		</dependency>
 	</dependencies>
+
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<groupId>com.amazonaws</groupId>
+				<artifactId>aws-java-sdk-bom</artifactId>
+				<version>1.11.772</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
 
 </project>
