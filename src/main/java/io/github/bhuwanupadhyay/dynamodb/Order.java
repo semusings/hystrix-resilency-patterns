@@ -9,6 +9,5 @@ import lombok.Data;
 @DynamoDBTable(tableName = "orders")
 public class Order {
   @DynamoDBHashKey private String orderId;
-  @DynamoDBAttribute
-  private OrderLine orderLine;
+  @DynamoDBAttribute private OrderLine orderLine;
 }

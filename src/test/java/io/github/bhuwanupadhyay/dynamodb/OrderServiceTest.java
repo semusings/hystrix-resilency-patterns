@@ -1,29 +1,28 @@
 package io.github.bhuwanupadhyay.dynamodb;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
-
-import static org.junit.jupiter.api.Assertions.*;
-
 @SpringBootTest
-class OrderRepositoryTest {
+class OrderServiceTest {
 
-  @Autowired private OrderRepository repository;
+  @Autowired private OrderService orderService;
 
   @Test
-  void canSave() {
-    final Order order = order();
+  void canPlaceOrderSuccessfully() {
+    Order order = order();
     order.setOrderId(UUID.randomUUID().toString());
-    try {
-      repository.save(order);
-    } catch (Exception e) {
-      fail("Not saved", e);
-    }
+    orderService.createOrder(order);
+  }
+
+  @Test
+  void whenNotPlaceOrderThenWriteToDLQ() {
+    Order order = order();
+    orderService.createOrder(order);
   }
 
   private Order order() {
