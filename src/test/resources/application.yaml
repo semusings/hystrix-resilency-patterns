@@ -13,3 +13,4 @@ app:
   aws:
     region: us-east-1
     queue-url: https://sqs.us-east-1.amazonaws.com/346901423380/orders
+    table-name: orders

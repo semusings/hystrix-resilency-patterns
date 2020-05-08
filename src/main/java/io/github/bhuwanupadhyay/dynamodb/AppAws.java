@@ -11,4 +11,5 @@ public class AppAws {
 
   private String region;
   private String queueUrl;
+  private String tableName;
 }

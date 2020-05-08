@@ -2,6 +2,7 @@ package io.github.bhuwanupadhyay.dynamodb;
 
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper;
+import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapperConfig;
 import com.amazonaws.services.sqs.AmazonSQS;
 import com.amazonaws.services.sqs.model.SendMessageRequest;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -22,10 +23,16 @@ public class OrderService {
   private final AppAws aws;
 
   public OrderService(AmazonDynamoDB dynamoDB, AmazonSQS amazonSQS, AppAws aws) {
-    this.objectMapper = new ObjectMapper().registerModule(new JavaTimeModule());
-    this.dynamoDBMapper = new DynamoDBMapper(dynamoDB);
     this.amazonSQS = amazonSQS;
     this.aws = aws;
+    this.objectMapper = new ObjectMapper().registerModule(new JavaTimeModule());
+    this.dynamoDBMapper =
+        new DynamoDBMapper(
+            dynamoDB,
+            DynamoDBMapperConfig.builder()
+                // Reading table name from configurations
+                .withTableNameResolver((clazz, config) -> aws.getTableName())
+                .build());
   }
 
   @HystrixCommand(commandKey = "createOrderCommand", fallbackMethod = "sendToQueue")

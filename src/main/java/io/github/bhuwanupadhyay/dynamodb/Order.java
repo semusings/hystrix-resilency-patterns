@@ -1,12 +1,16 @@
 package io.github.bhuwanupadhyay.dynamodb;
 
-import com.amazonaws.services.dynamodbv2.datamodeling.*;
+import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBAttribute;
+import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBHashKey;
+import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapperFieldModel;
+import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBTyped;
 import lombok.Data;
 
 import java.util.Map;
 
 @Data
-@DynamoDBTable(tableName = "orders")
+// Declarative way to define table name
+// @DynamoDBTable(tableName = "orders")
 public class Order {
   @DynamoDBHashKey private String orderId;
   @DynamoDBAttribute private OrderLine orderLine;
@@ -15,7 +19,5 @@ public class Order {
   @DynamoDBTyped(DynamoDBMapperFieldModel.DynamoDBAttributeType.S)
   private OrderStatus orderStatus;
 
-  @DynamoDBAttribute
-  private Map<String, String> additionalParams;
-
+  @DynamoDBAttribute private Map<String, String> additionalParams;
 }
