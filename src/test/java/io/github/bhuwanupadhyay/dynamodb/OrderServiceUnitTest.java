@@ -4,7 +4,6 @@ import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
 import com.amazonaws.services.dynamodbv2.model.UpdateItemRequest;
 import com.amazonaws.services.sqs.AmazonSQS;
 import com.amazonaws.services.sqs.model.SendMessageRequest;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -53,7 +52,7 @@ class OrderServiceUnitTest {
     when(dynamoDB.updateItem(any(UpdateItemRequest.class))).thenThrow(new RuntimeException(""));
     when(amazonSQS.sendMessage(any(SendMessageRequest.class))).thenThrow(new RuntimeException(""));
     Order order = newOrder();
-    Assertions.assertThrows(Exception.class, () -> orderService.sendToQueue(order));
+    orderService.sendToQueue(order);
     verify(amazonSQS, times(4)).sendMessage(any(SendMessageRequest.class));
   }
 

@@ -9,7 +9,6 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang.exception.ExceptionUtils;
 import org.springframework.retry.annotation.Recover;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Component;
@@ -31,7 +30,7 @@ public class OrderService {
 
   @HystrixCommand(commandKey = "createOrderCommand", fallbackMethod = "sendToQueue")
   public void createOrder(final Order order) {
-    log.info("BEGIN-----------#placeOrder");
+    log.info("BEGIN-----------#createOrder()");
     log.info("Saving order");
     try {
       dynamoDBMapper.save(order);
@@ -40,13 +39,14 @@ public class OrderService {
       log.error("Error on saving order.", e);
       throw e;
     } finally {
-      log.info("END-----------#placeOrder");
+      log.info("END-----------#createOrder()");
     }
   }
 
+  /** The fallback method needs to have same return type and parameters. */
   @Retryable(maxAttempts = 4)
   public void sendToQueue(Order order) {
-    log.info("BEGIN-----------#sendToQueue");
+    log.info("BEGIN-----------#sendToQueue()");
     log.info("On failure publishing order to dead later queue");
     try {
       final SendMessageRequest request =
@@ -54,17 +54,18 @@ public class OrderService {
       amazonSQS.sendMessage(request);
       log.info("Successfully published order.");
     } catch (Exception e) {
-      log.info("Error on publishing order [{}]", ExceptionUtils.getStackTrace(e));
+      log.error("Error on publishing order", e);
       throw e;
     } finally {
-      log.info("END-----------#sendToQueue");
+      log.info("END-----------#sendToQueue()");
     }
   }
 
+  /** The recover method needs to have same return type and parameters. */
   @Recover
-  public void notifyAdmin(Order order, Exception e) {
-    log.error("System not able handle create order request: {}", order, e);
-    throw new RuntimeException(e);
+  public void notifyAdmin(Order order) {
+    log.error("System not able handle create order request: {}", order);
+    log.info("Successfully notified to user.");
   }
 
   @SneakyThrows
