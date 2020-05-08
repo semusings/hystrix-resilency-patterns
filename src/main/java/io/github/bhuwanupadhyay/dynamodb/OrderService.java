@@ -10,8 +10,8 @@ import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.exception.ExceptionUtils;
-import org.springframework.retry.annotation.CircuitBreaker;
 import org.springframework.retry.annotation.Recover;
+import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -44,7 +44,7 @@ public class OrderService {
     }
   }
 
-  @CircuitBreaker(maxAttempts = 4)
+  @Retryable(maxAttempts = 4)
   public void sendToQueue(Order order) {
     log.info("BEGIN-----------#sendToQueue");
     log.info("On failure publishing order to dead later queue");

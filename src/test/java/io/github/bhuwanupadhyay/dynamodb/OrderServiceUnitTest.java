@@ -2,14 +2,12 @@ package io.github.bhuwanupadhyay.dynamodb;
 
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
 import com.amazonaws.services.dynamodbv2.model.UpdateItemRequest;
-import com.amazonaws.services.dynamodbv2.model.UpdateItemResult;
 import com.amazonaws.services.sqs.AmazonSQS;
 import com.amazonaws.services.sqs.model.SendMessageRequest;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -44,7 +42,7 @@ class OrderServiceUnitTest {
 
   @Test
   void whenNotPlaceOrderThenWriteToDLQ() {
-    when(dynamoDB.updateItem(any(UpdateItemRequest.class))).thenReturn(new UpdateItemResult());
+    when(dynamoDB.updateItem(any(UpdateItemRequest.class))).thenThrow(new RuntimeException(""));
     Order order = newOrder();
     orderService.createOrder(order);
     verify(amazonSQS).sendMessage(any(SendMessageRequest.class));
@@ -52,10 +50,10 @@ class OrderServiceUnitTest {
 
   @Test
   void whenNotPublishedThenRetryFourTimeTimes() {
-    when(dynamoDB.updateItem(any(UpdateItemRequest.class))).thenReturn(new UpdateItemResult());
+    when(dynamoDB.updateItem(any(UpdateItemRequest.class))).thenThrow(new RuntimeException(""));
     when(amazonSQS.sendMessage(any(SendMessageRequest.class))).thenThrow(new RuntimeException(""));
     Order order = newOrder();
-    orderService.createOrder(order);
+    Assertions.assertThrows(Exception.class, () -> orderService.sendToQueue(order));
     verify(amazonSQS, times(4)).sendMessage(any(SendMessageRequest.class));
   }
 
