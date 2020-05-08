@@ -10,12 +10,13 @@ import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.exception.ExceptionUtils;
+import org.springframework.retry.annotation.CircuitBreaker;
+import org.springframework.retry.annotation.Recover;
 import org.springframework.stereotype.Component;
 
 @Component
 @Slf4j
 public class OrderService {
-  public static final String REGION = "us-east-1";
   private final ObjectMapper objectMapper;
   private final DynamoDBMapper dynamoDBMapper;
   private final AmazonSQS amazonSQS;
@@ -28,7 +29,7 @@ public class OrderService {
     this.aws = aws;
   }
 
-  @HystrixCommand(fallbackMethod = "sendToQueue")
+  @HystrixCommand(commandKey = "createOrderCommand", fallbackMethod = "sendToQueue")
   public void createOrder(final Order order) {
     log.info("BEGIN-----------#placeOrder");
     log.info("Saving order");
@@ -43,14 +44,13 @@ public class OrderService {
     }
   }
 
+  @CircuitBreaker(maxAttempts = 4)
   public void sendToQueue(Order order) {
     log.info("BEGIN-----------#sendToQueue");
     log.info("On failure publishing order to dead later queue");
     try {
       final SendMessageRequest request =
-          new SendMessageRequest()
-              .withMessageBody(asString(order))
-              .withQueueUrl("https://sqs.us-east-1.amazonaws.com/346901423380/orders");
+          new SendMessageRequest().withMessageBody(asString(order)).withQueueUrl(aws.getQueueUrl());
       amazonSQS.sendMessage(request);
       log.info("Successfully published order.");
     } catch (Exception e) {
@@ -59,6 +59,12 @@ public class OrderService {
     } finally {
       log.info("END-----------#sendToQueue");
     }
+  }
+
+  @Recover
+  public void notifyAdmin(Order order, Exception e) {
+    log.error("System not able handle create order request: {}", order, e);
+    throw new RuntimeException(e);
   }
 
   @SneakyThrows

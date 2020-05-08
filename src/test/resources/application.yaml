@@ -1,7 +1,6 @@
-
 hystrix:
   command:
-    default: # Command Key
+    createOrderCommand: # Command Key
       execution:
         # Option-1
         timeout:

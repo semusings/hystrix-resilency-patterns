@@ -4,36 +4,38 @@ import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
 import com.amazonaws.services.dynamodbv2.model.UpdateItemRequest;
 import com.amazonaws.services.dynamodbv2.model.UpdateItemResult;
 import com.amazonaws.services.sqs.AmazonSQS;
+import com.amazonaws.services.sqs.model.SendMessageRequest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
-@ExtendWith(MockitoExtension.class)
+@SpringBootTest
+@ExtendWith(SpringExtension.class)
 class OrderServiceUnitTest {
 
-  private OrderService orderService;
+  @Autowired private OrderService orderService;
 
-  @Mock private AmazonDynamoDB dynamoDB;
-  @Mock private AmazonSQS amazonSQS;
+  @MockBean private AmazonDynamoDB dynamoDB;
+  @MockBean private AmazonSQS amazonSQS;
 
   @BeforeEach
-  void setUp() {
-    this.orderService = new OrderService(dynamoDB, amazonSQS, new AppAws());
-  }
+  void setUp() {}
 
   @Test
   void canPlaceOrderSuccessfully() {
-    when(dynamoDB.updateItem(any(UpdateItemRequest.class))).thenReturn(new UpdateItemResult());
     Order order = newOrder();
     order.setOrderId(UUID.randomUUID().toString());
     orderService.createOrder(order);
@@ -45,6 +47,16 @@ class OrderServiceUnitTest {
     when(dynamoDB.updateItem(any(UpdateItemRequest.class))).thenReturn(new UpdateItemResult());
     Order order = newOrder();
     orderService.createOrder(order);
+    verify(amazonSQS).sendMessage(any(SendMessageRequest.class));
+  }
+
+  @Test
+  void whenNotPublishedThenRetryFourTimeTimes() {
+    when(dynamoDB.updateItem(any(UpdateItemRequest.class))).thenReturn(new UpdateItemResult());
+    when(amazonSQS.sendMessage(any(SendMessageRequest.class))).thenThrow(new RuntimeException(""));
+    Order order = newOrder();
+    orderService.createOrder(order);
+    verify(amazonSQS, times(4)).sendMessage(any(SendMessageRequest.class));
   }
 
   private Order newOrder() {
