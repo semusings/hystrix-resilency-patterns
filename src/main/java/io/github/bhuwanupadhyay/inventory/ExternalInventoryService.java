@@ -24,7 +24,6 @@ public class ExternalInventoryService {
   private final AppProperties appProperties;
 
   @HystrixCommand(
-      fallbackMethod = "onFailedToFetchItem",
       commandKey = "fetchItemCommand",
       ignoreExceptions = {RetryableException.class})
   @Retryable(
