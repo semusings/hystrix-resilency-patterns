@@ -7,6 +7,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.cloud.contract.wiremock.AutoConfigureWireMock;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -23,6 +24,9 @@ class ExternalInventoryServiceTest {
 
   @Autowired private ExternalInventoryService service;
   @Autowired private AppProperties appProperties;
+
+  @Value("${fetchItemCommand.retry.maxAttempts}")
+  private Integer maxAttempts;
 
   @BeforeEach
   void setUp() {}
@@ -47,7 +51,7 @@ class ExternalInventoryServiceTest {
             });
 
     // then
-    verify(5, newRequestPattern(RequestMethod.GET, urlPattern));
+    verify(maxAttempts + 1, newRequestPattern(RequestMethod.GET, urlPattern));
     assertEquals(
         "All retried not successful, operation aborted due to failure of external api.",
         okResponseException.getMessage());

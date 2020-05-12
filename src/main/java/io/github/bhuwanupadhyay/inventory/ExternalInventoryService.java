@@ -33,7 +33,6 @@ public class ExternalInventoryService {
       backoff =
           @Backoff(
               delayExpression = "${fetchItemCommand.retry.backoff.delayInMilliseconds}",
-              maxDelayExpression = "${fetchItemCommand.retry.backoff.maxDelayInMilliseconds}",
               multiplierExpression = "${fetchItemCommand.retry.backoff.multiplier}"))
   public ItemPrice fetchItem(String itemCode) {
     try {
