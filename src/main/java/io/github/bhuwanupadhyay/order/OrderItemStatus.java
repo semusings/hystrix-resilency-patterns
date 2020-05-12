@@ -1,4 +1,4 @@
-package io.github.bhuwanupadhyay.dynamodb;
+package io.github.bhuwanupadhyay.order;
 
 public enum OrderItemStatus {
   AVAILABLE

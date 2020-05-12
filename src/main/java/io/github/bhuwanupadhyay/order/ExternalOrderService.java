@@ -1,4 +1,4 @@
-package io.github.bhuwanupadhyay.dynamodb;
+package io.github.bhuwanupadhyay.order;
 
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper;
@@ -8,6 +8,8 @@ import com.amazonaws.services.sqs.model.SendMessageRequest;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.netflix.hystrix.contrib.javanica.annotation.HystrixCommand;
+import io.github.bhuwanupadhyay.AppProperties;
+import io.github.bhuwanupadhyay.AppProperties.AwsProperties;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.retry.annotation.Recover;
@@ -16,22 +18,23 @@ import org.springframework.stereotype.Component;
 
 @Component
 @Slf4j
-public class OrderService {
+public class ExternalOrderService {
   private final ObjectMapper objectMapper;
   private final DynamoDBMapper dynamoDBMapper;
   private final AmazonSQS amazonSQS;
-  private final AppAws aws;
+  private final AwsProperties aws;
 
-  public OrderService(AmazonDynamoDB dynamoDB, AmazonSQS amazonSQS, AppAws aws) {
+  public ExternalOrderService(
+      AmazonDynamoDB dynamoDB, AmazonSQS amazonSQS, AppProperties appProperties) {
     this.amazonSQS = amazonSQS;
-    this.aws = aws;
+    this.aws = appProperties.getAws();
     this.objectMapper = new ObjectMapper().registerModule(new JavaTimeModule());
     this.dynamoDBMapper =
         new DynamoDBMapper(
             dynamoDB,
             DynamoDBMapperConfig.builder()
                 // Reading table name from configurations
-                .withTableNameResolver((clazz, config) -> aws.getTableName())
+                .withTableNameResolver((clazz, config) -> this.aws.getTableName())
                 .build());
   }
 

@@ -1,9 +1,16 @@
-package io.github.bhuwanupadhyay.dynamodb;
+package io.github.bhuwanupadhyay.order;
+
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
 
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
 import com.amazonaws.services.dynamodbv2.model.UpdateItemRequest;
 import com.amazonaws.services.sqs.AmazonSQS;
 import com.amazonaws.services.sqs.model.SendMessageRequest;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -12,18 +19,11 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
-
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
-
 @SpringBootTest
 @ExtendWith(SpringExtension.class)
-class OrderServiceUnitTest {
+class ExternalOrderServiceUnitTest {
 
-  @Autowired private OrderService orderService;
+  @Autowired private ExternalOrderService externalOrderService;
 
   @MockBean private AmazonDynamoDB dynamoDB;
   @MockBean private AmazonSQS amazonSQS;
@@ -35,7 +35,7 @@ class OrderServiceUnitTest {
   void canPlaceOrderSuccessfully() {
     Order order = newOrder();
     order.setOrderId(UUID.randomUUID().toString());
-    orderService.createOrder(order);
+    externalOrderService.createOrder(order);
     verify(dynamoDB).updateItem(any(UpdateItemRequest.class));
   }
 
@@ -43,7 +43,7 @@ class OrderServiceUnitTest {
   void whenNotPlaceOrderThenWriteToDLQ() {
     when(dynamoDB.updateItem(any(UpdateItemRequest.class))).thenThrow(new RuntimeException(""));
     Order order = newOrder();
-    orderService.createOrder(order);
+    externalOrderService.createOrder(order);
     verify(amazonSQS).sendMessage(any(SendMessageRequest.class));
   }
 
@@ -52,7 +52,7 @@ class OrderServiceUnitTest {
     when(dynamoDB.updateItem(any(UpdateItemRequest.class))).thenThrow(new RuntimeException(""));
     when(amazonSQS.sendMessage(any(SendMessageRequest.class))).thenThrow(new RuntimeException(""));
     Order order = newOrder();
-    orderService.sendToQueue(order);
+    externalOrderService.sendToQueue(order);
     verify(amazonSQS, times(4)).sendMessage(any(SendMessageRequest.class));
   }
 
@@ -61,10 +61,13 @@ class OrderServiceUnitTest {
     final OrderLine orderLine = new OrderLine();
 
     final List<OrderItem> orderItems = new ArrayList<>();
+    final HashMap<String, String> params = new HashMap<>();
+    params.put("A", "B");
 
     final OrderItem orderItem = new OrderItem();
     orderItem.setItemId("I#0001");
     orderItem.setQuantity(10);
+    orderItem.setAdditionalParams(params);
 
     orderItems.add(orderItem);
     orderLine.setOrderItems(orderItems);

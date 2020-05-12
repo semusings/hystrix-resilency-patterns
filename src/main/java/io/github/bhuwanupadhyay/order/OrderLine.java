@@ -1,4 +1,4 @@
-package io.github.bhuwanupadhyay.dynamodb;
+package io.github.bhuwanupadhyay.order;
 
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBAttribute;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBDocument;
