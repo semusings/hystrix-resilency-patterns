@@ -1,18 +1,18 @@
 {
-  "name": "18-dynamo-db-nested-object",
+  "name": "18-hystrix-resilency-patterns",
   "version": "0.0.0-snapshot",
-  "description": "Dynamo DB Nested Object",
+  "description": "Hystrix Resilency Patterns",
   "scripts": {},
   "repository": {
     "type": "git",
-    "url": "https://github.com/BhuwanUpadhyay/18-dynamo-db-nested-object.git"
+    "url": "https://github.com/BhuwanUpadhyay/18-hystrix-resilency-patterns.git"
   },
   "author": "Bhuwan Prasad Upadhyay",
   "license": "Apache-2.0",
   "bugs": {
-    "url": "https://github.com/BhuwanUpadhyay/18-dynamo-db-nested-object/issues"
+    "url": "https://github.com/BhuwanUpadhyay/18-hystrix-resilency-patterns/issues"
   },
-  "homepage": "https://github.com/BhuwanUpadhyay/18-dynamo-db-nested-object#readme",
+  "homepage": "https://github.com/BhuwanUpadhyay/18-hystrix-resilency-patterns#readme",
   "devDependencies": {
     "@commitlint/cli": "^8.3.5",
     "@commitlint/config-conventional": "^8.3.4",

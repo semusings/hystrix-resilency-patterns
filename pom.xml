@@ -4,7 +4,7 @@
 		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
-	<artifactId>18-dynamo-db-nested-object</artifactId>
+	<artifactId>18-hystrix-resilency-patterns</artifactId>
 	<version>1.0.0-SNAPSHOT</version>
 
 	<parent>
@@ -14,18 +14,18 @@
 	</parent>
 
 	<scm>
-		<url>https://github.com/BhuwanUpadhyay/18-dynamo-db-nested-object</url>
-		<connection>scm:git:git://github.com/BhuwanUpadhyay/18-dynamo-db-nested-object.git
+		<url>https://github.com/BhuwanUpadhyay/18-hystrix-resilency-patterns</url>
+		<connection>scm:git:git://github.com/BhuwanUpadhyay/18-hystrix-resilency-patterns.git
 		</connection>
 		<developerConnection>
-			scm:git:ssh://git@github.com/BhuwanUpadhyay/18-dynamo-db-nested-object.git
+			scm:git:ssh://git@github.com/BhuwanUpadhyay/18-hystrix-resilency-patterns.git
 		</developerConnection>
 		<tag>HEAD</tag>
 	</scm>
 
-	<name>Dynamo DB Nested Object</name>
-	<description>Demo Project to Dynamo DB Nested Object.</description>
-	<url>https://github.com/BhuwanUpadhyay/18-dynamo-db-nested-object</url>
+	<name>Hystrix Resilency Patterns</name>
+	<description>Demo Project to Hystrix Resilency Patterns.</description>
+	<url>https://github.com/BhuwanUpadhyay/18-hystrix-resilency-patterns</url>
 
 	<properties>
 		<java.version>14</java.version>

@@ -7,7 +7,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.*;
 import org.springframework.retry.annotation.Backoff;
-import org.springframework.retry.annotation.Recover;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClientException;
@@ -45,12 +44,6 @@ public class ExternalInventoryService {
        */
       throw new RetryableException(e);
     }
-  }
-
-  @Recover
-  public ItemPrice onFailedToFetchItem(String itemCode) {
-    throw new IllegalStateException(
-        "All retried not successful, operation aborted due to failure of external api.");
   }
 
   private ResponseEntity<ItemPrice> invokeApi(String itemCode) {
