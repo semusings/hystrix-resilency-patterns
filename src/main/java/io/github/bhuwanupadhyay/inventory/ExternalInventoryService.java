@@ -32,9 +32,9 @@ public class ExternalInventoryService {
           @Backoff(
               delayExpression = "${fetchItemCommand.retry.backoff.delayInMilliseconds}",
               multiplierExpression = "${fetchItemCommand.retry.backoff.multiplier}"))
-  public ItemPrice fetchItem(String itemCode) {
+  public ItemPrice fetchItem(String itemId) {
     try {
-      return invokeApi(itemCode).getBody();
+      return invokeApi(itemId).getBody();
     } catch (RestClientException e) {
       /**
        * {@link RestClientException} is a base class for exceptions thrown by {@link RestTemplate}
