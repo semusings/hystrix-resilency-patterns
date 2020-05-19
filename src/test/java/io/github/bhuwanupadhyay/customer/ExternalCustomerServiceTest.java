@@ -4,7 +4,6 @@ import com.github.tomakehurst.wiremock.http.RequestMethod;
 import com.github.tomakehurst.wiremock.matching.UrlPattern;
 import com.netflix.hystrix.exception.HystrixRuntimeException;
 import lombok.SneakyThrows;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -12,11 +11,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.cloud.contract.wiremock.AutoConfigureWireMock;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.HttpServerErrorException;
 
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static com.github.tomakehurst.wiremock.matching.RequestPatternBuilder.newRequestPattern;
 import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest
@@ -30,7 +31,7 @@ class ExternalCustomerServiceTest {
 
   @Test
   @SneakyThrows
-  void testOpenCircuit() {
+  void givenNotIgnoredException_whenFetch_thenShouldOpenTheCircuit() {
 
     // given
     String customerId = "ITM00001";
@@ -44,15 +45,14 @@ class ExternalCustomerServiceTest {
 
     // when
 
-    Assertions.assertThrows(
+    assertThrows(
         HttpServerErrorException.InternalServerError.class,
         () -> service.fetchCustomer(customerId));
 
     Thread.sleep(1000);
 
     HystrixRuntimeException e =
-        Assertions.assertThrows(
-            HystrixRuntimeException.class, () -> service.fetchCustomer(customerId));
+        assertThrows(HystrixRuntimeException.class, () -> service.fetchCustomer(customerId));
 
     // then
     assertEquals("fetchCustomerCommand short-circuited and fallback failed.", e.getMessage());
@@ -60,7 +60,7 @@ class ExternalCustomerServiceTest {
   }
 
   @Test
-  void testNotOpenCircuitWhileHttpClientErrorException() {
+  void givenIgnoredException_whenFetch_thenShouldInvokeDownstreamAPI() {
 
     // given
     String customerId = "ITM00001";
@@ -71,18 +71,16 @@ class ExternalCustomerServiceTest {
                 notFound().withHeader("Content-Type", "application/json").withBody("Not found.")));
 
     // when
-    safeFetchCustomer(customerId);
-    safeFetchCustomer(customerId);
-    safeFetchCustomer(customerId);
-    safeFetchCustomer(customerId);
-    safeFetchCustomer(customerId);
+    for (int i = 1; i < 5; i++) {
+      assertThrows(HttpClientErrorException.class, () -> service.fetchCustomer(customerId));
+    }
 
     // then
-    verify(5, newRequestPattern(RequestMethod.GET, urlPattern));
+    verify(4, newRequestPattern(RequestMethod.GET, urlPattern));
   }
 
   @Test
-  void testSuccessOnFetchingItemPrice() {
+  void givenOkResponse_whenFetch_thenShouldReturnCustomer() {
     // given
     String customerId = "ITM00001";
     stubFor(
@@ -97,14 +95,6 @@ class ExternalCustomerServiceTest {
 
     // then
     assertEquals("Bhuwan", customer.getName());
-  }
-
-  private void safeFetchCustomer(String customerId) {
-    try {
-      this.service.fetchCustomer(customerId);
-    } catch (Exception e) {
-
-    }
   }
 }
 
