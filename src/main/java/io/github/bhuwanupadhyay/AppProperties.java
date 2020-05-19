@@ -10,8 +10,8 @@ import org.springframework.stereotype.Component;
 public class AppProperties {
 
   private AwsProperties aws;
-
   private String inventoryBaseUrl;
+  private String customerBaseUrl;
 
   @Data
   public static class AwsProperties {

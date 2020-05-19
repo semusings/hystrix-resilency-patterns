@@ -43,18 +43,15 @@ class ExternalInventoryServiceTest {
                 notFound().withHeader("Content-Type", "application/json").withBody("Not found.")));
 
     // when
-    IllegalStateException okResponseException =
+    RetryableException okResponseException =
         assertThrows(
-            IllegalStateException.class,
+            RetryableException.class,
             () -> {
               this.service.fetchItem(itemCode);
             });
 
     // then
     verify(maxAttempts + 1, newRequestPattern(RequestMethod.GET, urlPattern));
-    assertEquals(
-        "All retried not successful, operation aborted due to failure of external api.",
-        okResponseException.getMessage());
   }
 
   @Test
